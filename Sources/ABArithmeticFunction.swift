@@ -1,5 +1,3 @@
-import Foundation
-
 
 /**
  Wraps a function into a struct. The function must take a ABVector and return the given type of ABMatrixOperableType This allows for generic typing of the function.

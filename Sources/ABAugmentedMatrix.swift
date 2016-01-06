@@ -1,4 +1,3 @@
-import Foundation
 
 public struct AugmentedABMatrix<T:ABMatrixOperableType>:CustomStringConvertible, ArrayLiteralConvertible {
     public typealias Element = [T]

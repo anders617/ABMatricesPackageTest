@@ -1,4 +1,3 @@
-import Foundation
 
 public protocol ABMatrixOperableType:Comparable, Equatable {
     static var defaultValue:Self {get}

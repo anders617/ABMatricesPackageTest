@@ -1,5 +1,3 @@
-import Foundation
-
 
 public struct ABMatrixRowGenerator<Element> {
     let matrix:ABMatrix<Element>

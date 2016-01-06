@@ -1,4 +1,3 @@
-import Foundation
 
 public struct ABVector<T>:CustomStringConvertible, ArrayLiteralConvertible{
     public typealias Element = T
