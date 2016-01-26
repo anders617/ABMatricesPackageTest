@@ -1,3 +1,5 @@
+import Foundation
+
 
 public struct ABMatrixRowGenerator<Element> {
     let matrix:ABMatrix<Element>
@@ -115,19 +117,54 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
         return newABMatrix
     }
     
+    public mutating func insertRow(row: ABVector<T>, atRowIndex rowIndex:Int) {
+        assert(row.count == columnCount, "Row:\(row.count) ColumnCount:\(columnCount)\nRow must have compatible dimensions with matrix")
+        grid.insertContentsOf(row.cells, at: index(rowIndex,0))
+    }
+    
+    public mutating func removeRowAtRowIndex(rowIndex:Int) {
+        grid.removeRange(Range(start: index(rowIndex,0), end: index(rowIndex,rowCount-1)))
+    }
+    
+    public mutating func appendRow(row: ABVector<T>) {
+        assert(row.count == columnCount, "Row:\(row.count) columnCount:\(columnCount)\nRow must have compatible dimensions with matrix")
+        insertRow(row, atRowIndex: rowCount)
+    }
+    
+    public mutating func insertColumn(column: ABVector<T>, atColumnIndex columnIndex:Int) {
+        assert(column.count == rowCount, "Column:\(column.count) rowCount:\(rowCount)\nColumn must have compatible dimensions with matrix")
+        for rowNum in 0..<column.count {
+            grid.insert(column[rowNum], atIndex: index(rowNum, columnIndex))
+        }
+    }
+    
+    public mutating func removeColumnAtColumnIndex(columnIndex:Int) {
+        for rowNum in 0..<rowCount {
+            grid.removeAtIndex(index(rowNum, columnIndex))
+        }
+    }
+    
+    public mutating func appendColumn(column:ABVector<T>) {
+        assert(column.count == rowCount, "Column:\(column.count) rowCount:\(rowCount)\nColumn must have compatible dimensions with matrix")
+        insertColumn(column, atColumnIndex: columnCount)
+    }
+    
     private func indexIsValidForRow(row: Int, column: Int) -> Bool {
         return row >= 0 && row < rowCount && column >= 0 && column < columnCount
     }
     
     public subscript(row: Int, column: Int) -> T {
         get {
-            assert(indexIsValidForRow(row, column: column), "Index out of range")
-            return grid[(row * columnCount) + column]
+            return grid[index(row, column)]
         }
         set {
-            assert(indexIsValidForRow(row, column: column), "Index out of range")
-            grid[(row * columnCount) + column] = newValue
+            grid[index(row, column)] = newValue
         }
+    }
+    
+    private func index(row:Int,_ column:Int) -> Int {
+        assert(indexIsValidForRow(row, column: column), "Index out of range")
+        return row * columnCount + column
     }
 }
 
