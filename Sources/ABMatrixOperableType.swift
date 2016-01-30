@@ -1,17 +1,18 @@
+import Foundation
 
 public protocol ABMatrixOperableType:Comparable, Equatable {
     static var defaultValue:Self {get}
     
-    func +(lhs:Self,_ rhs:Self) -> Self
-    func +=(inout lhs:Self,_ rhs:Self)
-    func -(lhs:Self,_ rhs:Self) -> Self
-    func -=(inout lhs:Self,_ rhs:Self)
-    func *(lhs:Self,_ rhs:Self) -> Self
-    func *=(inout lhs:Self,_ rhs:Self)
-    func /(lhs:Self,_ rhs:Self) -> Self
-    func/=(inout lhs:Self,_ rhs:Self)
-    func %(lhs:Self,_ rhs:Self) -> Self
-    func %=(inout lhs:Self,_ rhs:Self)
+    func +(lhs:Self, rhs:Self) -> Self
+    func +=(inout lhs:Self, rhs:Self)
+    func -(lhs:Self, rhs:Self) -> Self
+    func -=(inout lhs:Self, rhs:Self)
+    func *(lhs:Self, rhs:Self) -> Self
+    func *=(inout lhs:Self, rhs:Self)
+    func /(lhs:Self, rhs:Self) -> Self
+    func/=(inout lhs:Self, rhs:Self)
+    func %(lhs:Self, rhs:Self) -> Self
+    func %=(inout lhs:Self, rhs:Self)
     
     static func abs(x:Self)->Self
 }

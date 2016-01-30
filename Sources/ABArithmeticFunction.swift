@@ -1,3 +1,5 @@
+import Foundation
+
 
 /**
  Wraps a function into a struct. The function must take a ABVector and return the given type of ABMatrixOperableType This allows for generic typing of the function.
@@ -26,50 +28,50 @@ extension ArithmeticFunction:ABMatrixOperableType{
     public static func abs(x: ArithmeticFunction<T>) -> ArithmeticFunction<T> {return x}
 }
 
-public func ==<T:ABMatrixOperableType>(lhs:ArithmeticFunction<T>,_ rhs:ArithmeticFunction<T>) -> Bool {
+public func ==<T:ABMatrixOperableType>(lhs:ArithmeticFunction<T>,rhs:ArithmeticFunction<T>) -> Bool {
     return false
 }
 
-public func <<T:ABMatrixOperableType>(lhs:ArithmeticFunction<T>,_ rhs:ArithmeticFunction<T>) -> Bool {
+public func <<T:ABMatrixOperableType>(lhs:ArithmeticFunction<T>, rhs:ArithmeticFunction<T>) -> Bool {
     return false
 }
 
-@warn_unused_result public func +<T:ABMatrixOperableType>(lhs:ArithmeticFunction<T>,_ rhs:ArithmeticFunction<T>) -> ArithmeticFunction<T> {
+@warn_unused_result public func +<T:ABMatrixOperableType>(lhs:ArithmeticFunction<T>,rhs:ArithmeticFunction<T>) -> ArithmeticFunction<T> {
     return [{lhs.function($0) + rhs.function($0)}]
 }
 
-@warn_unused_result public func +=<T:ABMatrixOperableType>(inout lhs:ArithmeticFunction<T>,_ rhs:ArithmeticFunction<T>) {
+@warn_unused_result public func +=<T:ABMatrixOperableType>(inout lhs:ArithmeticFunction<T>, rhs:ArithmeticFunction<T>) {
     lhs = lhs + rhs
 }
 
-@warn_unused_result public func -<T:ABMatrixOperableType>(lhs:ArithmeticFunction<T>,_ rhs:ArithmeticFunction<T>) -> ArithmeticFunction<T> {
+@warn_unused_result public func -<T:ABMatrixOperableType>(lhs:ArithmeticFunction<T>, rhs:ArithmeticFunction<T>) -> ArithmeticFunction<T> {
     return [{lhs.function($0) - rhs.function($0)}]
 }
 
-@warn_unused_result public func -=<T:ABMatrixOperableType>(inout lhs:ArithmeticFunction<T>,_ rhs:ArithmeticFunction<T>) {
+@warn_unused_result public func -=<T:ABMatrixOperableType>(inout lhs:ArithmeticFunction<T>, rhs:ArithmeticFunction<T>) {
     lhs = lhs - rhs
 }
 
-@warn_unused_result public func *<T:ABMatrixOperableType>(lhs:ArithmeticFunction<T>,_ rhs:ArithmeticFunction<T>) -> ArithmeticFunction<T> {
+@warn_unused_result public func *<T:ABMatrixOperableType>(lhs:ArithmeticFunction<T>, rhs:ArithmeticFunction<T>) -> ArithmeticFunction<T> {
     return [{lhs.function($0) * rhs.function($0)}]
 }
 
-@warn_unused_result public func *=<T:ABMatrixOperableType>(inout lhs:ArithmeticFunction<T>,_ rhs:ArithmeticFunction<T>) {
+@warn_unused_result public func *=<T:ABMatrixOperableType>(inout lhs:ArithmeticFunction<T>, rhs:ArithmeticFunction<T>) {
     lhs = lhs * rhs
 }
 
-@warn_unused_result public func /<T:ABMatrixOperableType>(lhs:ArithmeticFunction<T>,_ rhs:ArithmeticFunction<T>) -> ArithmeticFunction<T> {
+@warn_unused_result public func /<T:ABMatrixOperableType>(lhs:ArithmeticFunction<T>, rhs:ArithmeticFunction<T>) -> ArithmeticFunction<T> {
     return [{lhs.function($0) / rhs.function($0)}]
 }
 
-@warn_unused_result public func /=<T:ABMatrixOperableType>(inout lhs:ArithmeticFunction<T>,_ rhs:ArithmeticFunction<T>) {
+@warn_unused_result public func /=<T:ABMatrixOperableType>(inout lhs:ArithmeticFunction<T>, rhs:ArithmeticFunction<T>) {
     lhs = lhs / rhs
 }
 
-@warn_unused_result public func %<T:ABMatrixOperableType>(lhs:ArithmeticFunction<T>,_ rhs:ArithmeticFunction<T>) -> ArithmeticFunction<T> {
+@warn_unused_result public func %<T:ABMatrixOperableType>(lhs:ArithmeticFunction<T>, rhs:ArithmeticFunction<T>) -> ArithmeticFunction<T> {
     return [{lhs.function($0) % rhs.function($0)}]
 }
 
-@warn_unused_result public func %=<T:ABMatrixOperableType>(inout lhs:ArithmeticFunction<T>,_ rhs:ArithmeticFunction<T>) {
+@warn_unused_result public func %=<T:ABMatrixOperableType>(inout lhs:ArithmeticFunction<T>, rhs:ArithmeticFunction<T>) {
     lhs = lhs % rhs
 }

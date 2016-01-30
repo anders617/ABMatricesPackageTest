@@ -41,7 +41,7 @@ public enum ABMatrixSide {
 public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
     public typealias Element = [T]
     
-    public let rowCount: Int, columnCount: Int
+    internal(set) var rowCount: Int, columnCount: Int
     internal var grid: [T]
     public var row:ABMatrixRowGenerator<T>{return ABMatrixRowGenerator<T>(self)}
     public var column:ABMatrixColumnGenerator<T>{return ABMatrixColumnGenerator<T>(self)}
@@ -108,40 +108,47 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
     
     private func mergeBottom(other: ABMatrix<T>) -> ABMatrix<T> {
         var newABMatrix = ABMatrix<T>(rowCount: self.rowCount+other.rowCount, columnCount: self.columnCount, withValue: grid[0])
-        for rowNum in 0..<self.rowCount { for columnNum in 0..<self.columnCount {
-                newABMatrix[rowNum,columnNum] = self[rowNum,columnNum]
-        }}
-        for rowNum in 0..<other.rowCount { for columnNum in 0..<other.columnCount {
-            newABMatrix[self.rowCount+rowNum-1,columnNum] = other[rowNum,columnNum]
-        }}
+        for rowNum in 0..<self.rowCount {
+            newABMatrix[rowNum] = self[rowNum]
+        }
+        for rowNum in 0..<other.rowCount {
+            newABMatrix[self.rowCount+rowNum] = other[rowNum]
+        }
         return newABMatrix
     }
     
     public mutating func insertRow(row: ABVector<T>, atRowIndex rowIndex:Int) {
         assert(row.count == columnCount, "Row:\(row.count) ColumnCount:\(columnCount)\nRow must have compatible dimensions with matrix")
         grid.insertContentsOf(row.cells, at: index(rowIndex,0))
+        rowCount++
     }
     
-    public mutating func removeRowAtRowIndex(rowIndex:Int) {
-        grid.removeRange(Range(start: index(rowIndex,0), end: index(rowIndex,rowCount-1)))
+    public mutating func removeRow(rowIndex:Int) {
+        let start = index(rowIndex,0)
+        let end = index(rowIndex,columnCount-1)
+        grid.removeRange(start...end)
+        rowCount--
     }
     
     public mutating func appendRow(row: ABVector<T>) {
         assert(row.count == columnCount, "Row:\(row.count) columnCount:\(columnCount)\nRow must have compatible dimensions with matrix")
         insertRow(row, atRowIndex: rowCount)
+        //grid.appendContentsOf(row.cells)
     }
     
     public mutating func insertColumn(column: ABVector<T>, atColumnIndex columnIndex:Int) {
         assert(column.count == rowCount, "Column:\(column.count) rowCount:\(rowCount)\nColumn must have compatible dimensions with matrix")
         for rowNum in 0..<column.count {
-            grid.insert(column[rowNum], atIndex: index(rowNum, columnIndex))
+            grid.insert(column[rowNum], atIndex: index(rowNum, columnIndex) + rowNum)
         }
+        columnCount++
     }
     
-    public mutating func removeColumnAtColumnIndex(columnIndex:Int) {
+    public mutating func removeColumn(columnIndex:Int) {
         for rowNum in 0..<rowCount {
-            grid.removeAtIndex(index(rowNum, columnIndex))
+            grid.removeAtIndex(index(rowNum, columnIndex) - rowNum)
         }
+        columnCount--
     }
     
     public mutating func appendColumn(column:ABVector<T>) {
@@ -155,21 +162,37 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
     
     public subscript(row: Int, column: Int) -> T {
         get {
+            assert(indexIsValidForRow(row, column: column), "Index out of range")
             return grid[index(row, column)]
         }
         set {
+            assert(indexIsValidForRow(row, column: column), "Index out of range")
             grid[index(row, column)] = newValue
         }
     }
     
+    public subscript(row:Int) -> ABVector<T> {
+        get {
+            assert(indexIsValidForRow(row, column: 0), "Index out of range")
+            let start = index(row, 0)
+            let end = index(row, columnCount-1)
+            return ABVector(Array(grid[start...end]))
+        }
+        set {
+            assert(indexIsValidForRow(row, column: 0), "Index out of range")
+            let start = index(row, 0)
+            let end = index(row, columnCount-1)
+            grid.replaceRange(start...end, with: newValue.cells)
+        }
+    }
+    
     private func index(row:Int,_ column:Int) -> Int {
-        assert(indexIsValidForRow(row, column: column), "Index out of range")
         return row * columnCount + column
     }
 }
 
 //TODO: Move Elsewhere
-public func ==<T:Equatable>(lhs:ABMatrix<T>,_ rhs:ABMatrix<T>) -> Bool {
+public func ==<T:Equatable>(lhs:ABMatrix<T>,rhs:ABMatrix<T>) -> Bool {
     if !(lhs.rowCount==rhs.rowCount && lhs.columnCount==rhs.columnCount) {return false}
     for rowNum in 0..<lhs.rowCount { for columnNum in 0..<lhs.columnCount {
         if(lhs[rowNum, columnNum] != rhs[rowNum, columnNum]) {return false}
