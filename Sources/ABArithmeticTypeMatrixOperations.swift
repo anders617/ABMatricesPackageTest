@@ -67,11 +67,9 @@ import Foundation
     typealias Thing = T
     assert(lhs.columnCount==rhs.rowCount, "Left hand column dimension must equal right hand row dimension in ABMatrix multiplication.")
     var newABMatrix = ABMatrix<T>(rowCount: lhs.rowCount, columnCount: rhs.columnCount, withValue: lhs[0,0])
-    let row = lhs.row
-    let column = rhs.column
     for rowNum in 0..<newABMatrix.rowCount {
-        for colNum in 0..<newABMatrix.columnCount {
-            newABMatrix[rowNum,colNum] = row[rowNum] * column[colNum]
+        for columnNum in 0..<newABMatrix.columnCount {
+            newABMatrix[rowNum,columnNum] = lhs.row(rowNum) * rhs.column(columnNum)
         }
     }
     return newABMatrix

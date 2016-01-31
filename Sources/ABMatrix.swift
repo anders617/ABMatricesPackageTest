@@ -1,39 +1,5 @@
 import Foundation
 
-
-public struct ABMatrixRowGenerator<Element> {
-    let matrix:ABMatrix<Element>
-    
-    init(_ matrix:ABMatrix<Element>) {
-        self.matrix = matrix
-    }
-    
-    public subscript(position:Int) -> ABVector<Element> {
-        assert((0..<matrix.innerRowCount) ~= position, "Index out of range.")
-        var row = ABVector<Element>(count: matrix.innerColumnCount, repeatedValue: matrix.grid[0])
-        for col in 0..<matrix.innerColumnCount {
-            row[col] = matrix.grid[(position * matrix.innerColumnCount) + col]
-        }
-        return row
-    }
-}
-
-public struct ABMatrixColumnGenerator<Element> {
-    var matrix:ABMatrix<Element>
-    init(_ matrix:ABMatrix<Element>) {
-        self.matrix = matrix
-    }
-    
-    public subscript(position:Int) -> ABVector<Element> {
-        assert((0..<matrix.innerColumnCount) ~= position, "Index out of range.")
-        var column = ABVector<Element>(count: matrix.innerRowCount, repeatedValue: matrix.grid[0])
-        for row in 0..<matrix.innerRowCount {
-            column[row] = matrix.grid[(row * matrix.innerColumnCount) + position]
-        }
-        return column
-    }
-}
-
 public enum ABMatrixSide {
     case Left,Right,Top,Bottom
 }
@@ -42,8 +8,6 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
     public typealias Element = [T]
     private var innerRowCount: Int, innerColumnCount: Int
     internal var grid: [T]
-    public var row:ABMatrixRowGenerator<T>{return ABMatrixRowGenerator<T>(self)}
-    public var column:ABMatrixColumnGenerator<T>{return ABMatrixColumnGenerator<T>(self)}
     
     public var rowCount:Int {
         return innerRowCount
@@ -63,8 +27,8 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
         return output
     }
     
-    public var transpose:ABMatrix<T> {
-        var transposedABMatrix = ABMatrix<T>(rowCount: innerColumnCount, columnCount: innerRowCount, withValue: grid[0])
+    public var transpose:ABMatrix {
+        var transposedABMatrix = ABMatrix(rowCount: innerColumnCount, columnCount: innerRowCount, withValue: grid[0])
         for rowNum in 0..<innerRowCount {
             for colNum in 0..<innerColumnCount {
                 transposedABMatrix[colNum,rowNum] = self[rowNum,colNum]
@@ -92,7 +56,7 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
         }
     }
     
-    public func merge(other:ABMatrix<T>, onSide side:ABMatrixSide) -> ABMatrix<T> {
+    public func merge(other:ABMatrix, onSide side:ABMatrixSide) -> ABMatrix {
         switch side {
         case .Right: return self.mergeRight(other)
         case .Left: return other.mergeRight(self)
@@ -101,8 +65,8 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
         }
     }
     
-    private func mergeRight(other: ABMatrix<T>) -> ABMatrix<T> {
-        var newABMatrix = ABMatrix<T>(rowCount: innerRowCount, columnCount: innerColumnCount+other.innerColumnCount, withValue: grid[0])
+    private func mergeRight(other: ABMatrix) -> ABMatrix {
+        var newABMatrix = ABMatrix(rowCount: innerRowCount, columnCount: innerColumnCount+other.innerColumnCount, withValue: grid[0])
         for rowNum in 0..<innerRowCount {for columnNum in 0..<innerColumnCount {
                 newABMatrix[rowNum,columnNum] = self[rowNum,columnNum]
         }}
@@ -112,8 +76,8 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
         return newABMatrix
     }
     
-    private func mergeBottom(other: ABMatrix<T>) -> ABMatrix<T> {
-        var newABMatrix = ABMatrix<T>(rowCount: innerRowCount+other.innerRowCount, columnCount: innerColumnCount, withValue: grid[0])
+    private func mergeBottom(other: ABMatrix) -> ABMatrix {
+        var newABMatrix = ABMatrix(rowCount: innerRowCount+other.innerRowCount, columnCount: innerColumnCount, withValue: grid[0])
         for rowNum in 0..<innerRowCount {
             newABMatrix[rowNum] = self[rowNum]
         }
@@ -126,14 +90,14 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
     public mutating func insertRow(row: ABVector<T>, atRowIndex rowIndex:Int) {
         assert(row.count == innerColumnCount, "Row:\(row.count) innerColumnCount:\(innerColumnCount)\nRow must have compatible dimensions with matrix")
         grid.insertContentsOf(row.cells, at: index(rowIndex,0))
-        innerRowCount++
+        innerRowCount += 1
     }
     
     public mutating func removeRow(rowIndex:Int) {
         let start = index(rowIndex,0)
         let end = index(rowIndex,innerColumnCount-1)
         grid.removeRange(start...end)
-        innerRowCount--
+        innerRowCount -= 1
     }
     
     public mutating func appendRow(row: ABVector<T>) {
@@ -147,14 +111,14 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
         for rowNum in 0..<column.count {
             grid.insert(column[rowNum], atIndex: index(rowNum, columnIndex) + rowNum)
         }
-        innerColumnCount++
+        innerColumnCount += 1
     }
     
     public mutating func removeColumn(columnIndex:Int) {
         for rowNum in 0..<innerRowCount {
             grid.removeAtIndex(index(rowNum, columnIndex) - rowNum)
         }
-        innerColumnCount--
+        innerColumnCount -= 1
     }
     
     public mutating func appendColumn(column:ABVector<T>) {
@@ -164,6 +128,37 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
     
     private func indexIsValidForRow(row: Int, column: Int) -> Bool {
         return row >= 0 && row < innerRowCount && column >= 0 && column < innerColumnCount
+    }
+    
+    public func column(columnNum:Int) -> ABVector<T> {
+        assert(indexIsValidForRow(0, column: columnNum), "Index out of range.")
+        var column = ABVector<T>(count: innerRowCount, repeatedValue: grid[0])
+        for rowNum in 0..<innerRowCount {
+            column[rowNum] = grid[index(rowNum, columnNum)]
+        }
+        return column
+    }
+    
+    public mutating func setColumn(columnNum:Int, newColumn: ABVector<T>) {
+        assert(indexIsValidForRow(0, column: columnNum), "Index out of range.")
+        assert(newColumn.count == innerColumnCount, "New column count must match current matrix.")
+        for rowNum in 0..<newColumn.count {
+            self[rowNum,columnNum] = newColumn[rowNum]
+        }
+    }
+    
+    public func row(rowNum:Int) -> ABVector<T> {
+        assert(indexIsValidForRow(rowNum, column: 0), "Index out of range.")
+        let start = index(rowNum, 0)
+        let end = index(rowNum, innerColumnCount-1)
+        return ABVector(Array(grid[start...end]))
+    }
+    
+    public mutating func setRow(rowNum:Int, newRow: ABVector<T>) {
+        assert(indexIsValidForRow(rowNum, column: 0), "Index out of range")
+        let start = index(rowNum, 0)
+        let end = index(rowNum, innerColumnCount-1)
+        grid.replaceRange(start...end, with: newRow.cells)
     }
     
     public subscript(row: Int, column: Int) -> T {
@@ -177,18 +172,12 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
         }
     }
     
-    public subscript(row:Int) -> ABVector<T> {
+    public subscript(rowNum:Int) -> ABVector<T> {
         get {
-            assert(indexIsValidForRow(row, column: 0), "Index out of range")
-            let start = index(row, 0)
-            let end = index(row, innerColumnCount-1)
-            return ABVector(Array(grid[start...end]))
+            return row(rowNum)
         }
         set {
-            assert(indexIsValidForRow(row, column: 0), "Index out of range")
-            let start = index(row, 0)
-            let end = index(row, innerColumnCount-1)
-            grid.replaceRange(start...end, with: newValue.cells)
+            setRow(rowNum, newRow: newValue)
         }
     }
     
@@ -200,8 +189,10 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
 //TODO: Move Elsewhere
 public func ==<T:Equatable>(lhs:ABMatrix<T>,rhs:ABMatrix<T>) -> Bool {
     if !(lhs.innerRowCount==rhs.innerRowCount && lhs.innerColumnCount==rhs.innerColumnCount) {return false}
-    for rowNum in 0..<lhs.innerRowCount { for columnNum in 0..<lhs.innerColumnCount {
-        if(lhs[rowNum, columnNum] != rhs[rowNum, columnNum]) {return false}
-    }}
+    for rowNum in 0..<lhs.innerRowCount {
+        for columnNum in 0..<lhs.innerColumnCount {
+            if(lhs[rowNum, columnNum] != rhs[rowNum, columnNum]) {return false}
+        }
+    }
     return true
 }

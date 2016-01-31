@@ -1,3 +1,4 @@
+import Foundation
 
 public struct AugmentedABMatrix<T:ABMatrixOperableType>:CustomStringConvertible, ArrayLiteralConvertible {
     public typealias Element = [T]
@@ -47,12 +48,11 @@ public struct AugmentedABMatrix<T:ABMatrixOperableType>:CustomStringConvertible,
     }
     
     public mutating func rowSwap(firstIndex:Int, _ secondIndex:Int) {
-        let row = matrix.row
-        let firstRow = row[firstIndex]
-        let secondRow = row[secondIndex]
+        let firstRow = matrix[firstIndex]
+        let secondRow = matrix[secondIndex]
         for i in 0..<self.size+1 {
-            self.matrix[firstIndex, i] = secondRow[i]
-            self.matrix[secondIndex, i] = firstRow[i]
+            matrix[firstIndex, i] = secondRow[i]
+            matrix[secondIndex, i] = firstRow[i]
         }
     }
     
@@ -69,14 +69,14 @@ public struct AugmentedABMatrix<T:ABMatrixOperableType>:CustomStringConvertible,
     }
     
     public mutating func addRow(firstRowNum:Int, toRow secondRowNum:Int, withFactor factor:T) {
-        let firstRow = self.matrix.row[firstRowNum]
+        let firstRow = self.matrix.row(firstRowNum)
         for columnNum in 0..<self.size+1 {
             self.matrix[secondRowNum, columnNum] += (firstRow[columnNum]*factor)
         }
     }
     
     public mutating func subtractRow(firstRowNum:Int, toRow secondRowNum:Int, withFactor factor:T) {
-        let firstRow = self.matrix.row[firstRowNum]
+        let firstRow = self.matrix.row(firstRowNum)
         for columnNum in 0..<self.size+1 {
             self.matrix[secondRowNum, columnNum] -= (firstRow[columnNum]*factor)
         }
