@@ -87,9 +87,9 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
         return newABMatrix
     }
     
-    public mutating func insertRow(row: ABVector<T>, atRowIndex rowIndex:Int) {
-        assert(row.count == innerColumnCount, "Row:\(row.count) innerColumnCount:\(innerColumnCount)\nRow must have compatible dimensions with matrix")
-        grid.insertContentsOf(row.cells, at: index(rowIndex,0))
+    public mutating func insertRow(newRow: ABVector<T>, atIndex rowNum:Int) {
+        assert(newRow.count == innerColumnCount, "Row:\(newRow.count) innerColumnCount:\(innerColumnCount)\nRow must have compatible dimensions with matrix")
+        grid.insertContentsOf(newRow.cells, at: index(rowNum,0))
         innerRowCount += 1
     }
     
@@ -102,28 +102,27 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
     
     public mutating func appendRow(row: ABVector<T>) {
         assert(row.count == innerColumnCount, "Row:\(row.count) innerColumnCount:\(innerColumnCount)\nRow must have compatible dimensions with matrix")
-        insertRow(row, atRowIndex: innerRowCount)
-        //grid.appendContentsOf(row.cells)
+        insertRow(row, atIndex: innerRowCount)
     }
     
-    public mutating func insertColumn(column: ABVector<T>, atColumnIndex columnIndex:Int) {
-        assert(column.count == innerRowCount, "Column:\(column.count) innerRowCount:\(innerRowCount)\nColumn must have compatible dimensions with matrix")
-        for rowNum in 0..<column.count {
-            grid.insert(column[rowNum], atIndex: index(rowNum, columnIndex) + rowNum)
+    public mutating func insertColumn(newColumn: ABVector<T>, atIndex columnNum:Int) {
+        assert(newColumn.count == innerRowCount, "Column:\(newColumn.count) innerRowCount:\(innerRowCount)\nColumn must have compatible dimensions with matrix")
+        for rowNum in 0..<newColumn.count {
+            grid.insert(newColumn[rowNum], atIndex: index(rowNum, columnNum) + rowNum)
         }
         innerColumnCount += 1
     }
     
-    public mutating func removeColumn(columnIndex:Int) {
+    public mutating func removeColumn(columnNum:Int) {
         for rowNum in 0..<innerRowCount {
-            grid.removeAtIndex(index(rowNum, columnIndex) - rowNum)
+            grid.removeAtIndex(index(rowNum, columnNum) - rowNum)
         }
         innerColumnCount -= 1
     }
     
     public mutating func appendColumn(column:ABVector<T>) {
         assert(column.count == innerRowCount, "Column:\(column.count) innerRowCount:\(innerRowCount)\nColumn must have compatible dimensions with matrix")
-        insertColumn(column, atColumnIndex: innerColumnCount)
+        insertColumn(column, atIndex: innerColumnCount)
     }
     
     private func indexIsValidForRow(row: Int, column: Int) -> Bool {
@@ -139,7 +138,7 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
         return column
     }
     
-    public mutating func setColumn(columnNum:Int, newColumn: ABVector<T>) {
+    public mutating func setColumn(newColumn: ABVector<T>, atIndex columnNum:Int) {
         assert(indexIsValidForRow(0, column: columnNum), "Index out of range.")
         assert(newColumn.count == innerColumnCount, "New column count must match current matrix.")
         for rowNum in 0..<newColumn.count {
@@ -154,7 +153,7 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
         return ABVector(Array(grid[start...end]))
     }
     
-    public mutating func setRow(rowNum:Int, newRow: ABVector<T>) {
+    public mutating func setRow(newRow: ABVector<T>, atIndex rowNum:Int) {
         assert(indexIsValidForRow(rowNum, column: 0), "Index out of range")
         let start = index(rowNum, 0)
         let end = index(rowNum, innerColumnCount-1)
@@ -177,7 +176,7 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
             return row(rowNum)
         }
         set {
-            setRow(rowNum, newRow: newValue)
+            setRow(newValue, atIndex: rowNum)
         }
     }
     
