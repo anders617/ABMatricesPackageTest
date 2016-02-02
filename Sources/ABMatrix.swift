@@ -67,12 +67,16 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
     
     private func mergeRight(other: ABMatrix) -> ABMatrix {
         var newABMatrix = ABMatrix(rowCount: innerRowCount, columnCount: innerColumnCount+other.innerColumnCount, withValue: grid[0])
-        for rowNum in 0..<innerRowCount {for columnNum in 0..<innerColumnCount {
+        for rowNum in 0..<innerRowCount {
+            for columnNum in 0..<innerColumnCount {
                 newABMatrix[rowNum,columnNum] = self[rowNum,columnNum]
-        }}
-        for rowNum in 0..<other.innerRowCount {for columnNum in 0..<other.innerColumnCount {
+            }
+        }
+        for rowNum in 0..<other.innerRowCount {
+            for columnNum in 0..<other.innerColumnCount {
                 newABMatrix[rowNum,innerColumnCount+columnNum] = other[rowNum,columnNum]
-        }}
+            }
+        }
         return newABMatrix
     }
     
@@ -140,7 +144,7 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
     
     public mutating func setColumn(newColumn: ABVector<T>, atIndex columnNum:Int) {
         assert(indexIsValidForRow(0, column: columnNum), "Index out of range.")
-        assert(newColumn.count == innerColumnCount, "New column count must match current matrix.")
+        assert(newColumn.count == innerRowCount, "New Column Count:\(newColumn.count) rowCount: \(innerColumnCount)\nNew column count must match current matrix.")
         for rowNum in 0..<newColumn.count {
             self[rowNum,columnNum] = newColumn[rowNum]
         }
