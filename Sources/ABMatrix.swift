@@ -105,7 +105,7 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
     }
     
     public mutating func appendRow(row: ABVector<T>) {
-        assert(row.count == innerColumnCount, "Row:\(row.count) innerColumnCount:\(innerColumnCount)\nRow must have compatible dimensions with matrix")
+        assert(row.count == innerColumnCount, "New row column count:\(row.count) innerColumnCount:\(innerColumnCount)\nRow must have compatible dimensions with matrix")
         insertRow(row, atIndex: innerRowCount)
     }
     

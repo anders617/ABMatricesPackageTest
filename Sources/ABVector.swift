@@ -1,3 +1,4 @@
+import Foundation
 
 public struct ABVector<T>:CustomStringConvertible, ArrayLiteralConvertible{
     public typealias Element = T
@@ -21,16 +22,12 @@ public struct ABVector<T>:CustomStringConvertible, ArrayLiteralConvertible{
     
     public init(_ elements:[ABVector.Element]) {
         self.init(count:elements.count, repeatedValue: elements.first!)
-        for i in 0..<elements.count {
-            cells[i] = elements[i]
-        }
+        cells = elements
     }
     
     public init(arrayLiteral elements: ABVector.Element...) {
         self.init(count:elements.count, repeatedValue: elements.first!)
-        for i in 0..<elements.count {
-            cells[i] = elements[i]
-        }
+        cells = elements
     }
     
     public subscript(position:Int) -> T {
@@ -42,5 +39,13 @@ public struct ABVector<T>:CustomStringConvertible, ArrayLiteralConvertible{
             assert((0..<count) ~= position, "Index out of range.")
             cells[position] = newValue
         }
+    }
+    
+    public mutating func append(element:ABVector.Element) {
+        cells.append(element)
+    }
+    
+    public mutating func removeAtIndex(index:Int) {
+        cells.removeAtIndex(index)
     }
 }
