@@ -49,3 +49,12 @@ public struct ABVector<T>:CustomStringConvertible, ArrayLiteralConvertible{
         cells.removeAtIndex(index)
     }
 }
+
+extension ABVector where ABVector<T>.Element:Equatable {
+    public func allEqual(value:Element) -> Bool {
+        for cell in cells {
+            if cell != value {return false}
+        }
+        return true
+    }
+}

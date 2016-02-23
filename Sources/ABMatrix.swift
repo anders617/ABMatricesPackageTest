@@ -37,6 +37,22 @@ public struct ABMatrix <T>:CustomStringConvertible,ArrayLiteralConvertible {
         return transposedABMatrix
     }
     
+    public var firstRow:ABVector<T> {
+        return self[0]
+    }
+    
+    public var firstColumn:ABVector<T> {
+        return self.column(0)
+    }
+    
+    public var lastRow:ABVector<T> {
+        return self[innerRowCount-1]
+    }
+    
+    public var lastColumn:ABVector<T> {
+        return self.column(innerColumnCount-1)
+    }
+    
     public init(rowCount: Int, columnCount: Int, withValue value: T) {
         assert(rowCount>0, "Number of innerRowCount in a ABMatrix must be greater than zero")
         assert(columnCount>0, "Number of innerColumnCount in a ABMatrix must be greater than zero")
